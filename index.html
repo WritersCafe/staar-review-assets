@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Writer’s Cafe - Controlling Idea</title>
+  <style>
+    /* Canva-safe: no external fonts, no libraries */
+    #wcWrap{
+      background:url('https://raw.githubusercontent.com/WritersCafe/staar-review-assets/main/ChatGPT%20Image%20Feb%2024%2C%202026%2C%2006_25_31%20PM.png')
+        center/cover no-repeat;
+      border-radius:18px;
+      padding:18px;
+      max-width:980px;
+      margin:24px auto;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+    .overlay{
+      background:rgba(255,255,255,.10);
+      border-radius:16px;
+      padding:14px;
+      backdrop-filter: blur(2px);
+    }
+    .card{
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:14px;
+      padding:12px 14px;
+      box-shadow:0 10px 24px rgba(0,0,0,.10);
+    }
+    .subtle{ background:rgba(255,255,255,.72); }
+
+    .header{
+      text-align:center;
+      margin-bottom:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .title{ font-weight:800; letter-spacing:.6px; font-size:22px; }
+    .subtitle{ font-weight:700; font-size:18px; margin-top:2px; }
+    .handle{ opacity:.85; font-weight:600; margin-top:2px; }
+
+    .row{ display:flex; gap:12px; flex-wrap:wrap; }
+    .row.top{ align-items:stretch; margin-bottom:12px; }
+    .row.mid{ margin:12px 0; }
+
+    .bubble{ flex: 1 1 360px; position:relative; }
+    .stack{ flex: 1 1 260px; display:flex; flex-direction:column; gap:12px; }
+    .bubbleLabel{ font-size:12px; font-weight:800; opacity:.75; margin-bottom:6px; }
+    .bubbleText{ font-size:14px; line-height:1.35; }
+    .bubbleHidden{ display:none; margin-top:8px; font-size:13px; line-height:1.35; }
+    .clickable{ cursor:pointer; }
+    .clickable:active{ transform: scale(.99); }
+
+    .miniNote{ font-size:13px; line-height:1.35; }
+
+    .passage{ margin:8px 0 12px; }
+    .sectionTitle{ font-weight:900; margin-bottom:6px; }
+    .passageText{ font-size:14px; line-height:1.45; }
+
+    .definition{ flex:1 1 320px; }
+    .defText{ font-size:14px; line-height:1.4; margin-bottom:8px; }
+    .defExample{ font-size:13px; line-height:1.35; margin-bottom:8px; }
+    .hint{ font-size:13px; opacity:.9; }
+
+    .dragArea{ flex:1 1 420px; }
+    .dropZone{
+      background:rgba(255,255,255,.65);
+      border:2px dashed rgba(0,0,0,.25);
+      border-radius:14px;
+      padding:14px;
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:10px 0 10px;
+      text-align:center;
+      font-weight:700;
+    }
+    .dropZone.good{ border-color: rgba(22,163,74,.65); }
+    .dropZone.bad{ border-color: rgba(239,68,68,.65); }
+
+    .drags{ display:flex; gap:10px; flex-wrap:wrap; }
+    .drag{
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      padding:10px 10px;
+      cursor:grab;
+      user-select:none;
+      font-size:13px;
+      flex:1 1 180px;
+    }
+
+    .quiz .q{ margin:6px 0 10px; font-weight:700; }
+    .choices{ display:flex; flex-direction:column; gap:8px; }
+    .choice{
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:12px;
+      padding:10px;
+      font-size:13.5px;
+    }
+    .choice input{ margin-right:8px; }
+
+    textarea{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.15);
+      padding:10px;
+      font-size:14px;
+      resize:vertical;
+      background:rgba(255,255,255,.9);
+    }
+    .prompt{ font-size:14px; margin:6px 0 10px; font-weight:650; }
+
+    .btnRow{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      background:rgba(0,0,0,.10);
+    }
+    .btn.primary{ background:rgba(37,99,235,.16); }
+    .btn:active{ transform:scale(.99); }
+
+    .feedback{
+      margin-top:10px;
+      font-weight:900;
+      min-height:20px;
+    }
+    .ok{ color:#166534; }
+    .no{ color:#b91c1c; }
+
+    @keyframes wiggle {
+      0%{transform:translateX(0)}
+      20%{transform:translateX(-4px)}
+      40%{transform:translateX(4px)}
+      60%{transform:translateX(-3px)}
+      80%{transform:translateX(3px)}
+      100%{transform:translateX(0)}
+    }
+    .wiggle{ animation:wiggle .25s linear 2; }
+  </style>
+</head>
+
+<body>
+  <div id="wcWrap">
+    <div class="overlay">
+
+      <div class="header">
+        <div class="title">WRITER’S CAFE MAGAZINE</div>
+        <div class="subtitle">Controlling Idea</div>
+        <div class="handle">@WritersCafe208</div>
+      </div>
+
+      <div class="row top">
+        <div class="bubble card clickable" id="teacherBubble" role="button" tabindex="0">
+          <div class="bubbleLabel">Teacher Tip (click)</div>
+          <div class="bubbleText">
+            Think of the controlling idea as the central point of the article—it tells what the whole text is about.
+          </div>
+          <div class="bubbleHidden" id="teacherHidden">
+            <b>Look-for:</b> repeated topic words + what the author is trying to prove about that topic.
+            <br><b>Test it:</b> “If I removed this sentence, would the article still be about the same main point?”
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="bubble card clickable voice" data-voice="mia" role="button" tabindex="0">
+            <div class="bubbleLabel">Mia says (click)</div>
+            <div class="bubbleText">“It’s the main idea… like the headline of an article, right?”</div>
+          </div>
+          <div class="bubble card clickable voice" data-voice="jay" role="button" tabindex="0">
+            <div class="bubbleLabel">Jay says (click)</div>
+            <div class="bubbleText">“Yeah, it’s the author’s key message.”</div>
+          </div>
+          <div class="miniNote card" id="voiceCoach">
+            <b>Thinking Coach:</b> Click a student bubble → then answer: <i>“So what is the author trying to get us to believe?”</i>
+          </div>
+        </div>
+      </div>
+
+      <div class="passage card">
+        <div class="sectionTitle">Read the mini article</div>
+        <div class="passageText">
+          Texas summers can be brutally hot, with temperatures often exceeding 100°F. Extreme heat poses risks to
+          students’ health, so schools might need to adapt to protect them from heat exhaustion or other illnesses.
+        </div>
+      </div>
+
+      <div class="row mid">
+        <div class="definition card">
+          <div class="sectionTitle">Controlling Idea =</div>
+          <div class="defText">The controlling idea is the <b>main point</b> the author wants to make.</div>
+          <div class="defExample"><b>Example:</b> Schools need to adapt to protect students from extreme heat.</div>
+          <div class="hint"><b>Hint:</b> It’s broader than one detail, but specific enough to match the whole passage.</div>
+        </div>
+
+        <div class="dragArea card">
+          <div class="sectionTitle">Drag the BEST controlling idea into the box</div>
+
+          <div class="dropZone" id="dropZone">
+            <div class="dropPrompt">Drop the controlling idea here</div>
+          </div>
+
+          <div class="drags" id="drags">
+            <div class="drag" draggable="true" data-correct="false">Hot weather makes summer fun.</div>
+            <div class="drag" draggable="true" data-correct="false">Students should drink plenty of water.</div>
+            <div class="drag" draggable="true" data-correct="true">Schools need to prepare for extreme heat.</div>
+            <div class="drag" draggable="true" data-correct="false">Schools should ban summer sports.</div>
+          </div>
+
+          <div class="feedback" id="dragFeedback"></div>
+
+          <div class="btnRow">
+            <button class="btn" id="resetDrag" type="button">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz card">
+        <div class="sectionTitle">Quick Sip Check ☕</div>
+        <div class="q">What’s the controlling idea of the article?</div>
+
+        <div class="choices" role="group" aria-label="Multiple choice">
+          <label class="choice"><input type="radio" name="q1" value="A"> A. Hot weather makes summer fun.</label>
+          <label class="choice"><input type="radio" name="q1" value="B"> B. Students should drink plenty of water.</label>
+          <label class="choice"><input type="radio" name="q1" value="C"> C. Schools need to prepare for extreme heat.</label>
+          <label class="choice"><input type="radio" name="q1" value="D"> D. Schools should ban summer sports.</label>
+        </div>
+
+        <div class="btnRow">
+          <button class="btn primary" id="checkQ1" type="button">Check Answer</button>
+          <button class="btn" id="resetQ1" type="button">Reset</button>
+        </div>
+
+        <div class="feedback" id="q1Feedback"></div>
+      </div>
+
+      <div class="reflection card" style="margin-top:12px;">
+        <div class="sectionTitle">Put it in your own words</div>
+        <div class="prompt">If I put the article’s main point in my own words, how would I say it?</div>
+        <textarea id="studentResponse" rows="3" placeholder="Start with: The author wants readers to understand that..."></textarea>
+
+        <div class="btnRow">
+          <button class="btn primary" id="saveResponse" type="button">Save</button>
+          <button class="btn" id="clearResponse" type="button">Clear</button>
+        </div>
+
+        <div class="feedback" id="saveFeedback"></div>
+        <div class="miniNote card subtle">
+          <b>Self-check:</b> Does your sentence match the whole passage (not just one detail)?
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const teacherBubble = document.getElementById('teacherBubble');
+      const teacherHidden = document.getElementById('teacherHidden');
+
+      function toggleTeacher(){
+        const open = teacherHidden.style.display === 'block';
+        teacherHidden.style.display = open ? 'none' : 'block';
+      }
+      teacherBubble.addEventListener('click', toggleTeacher);
+      teacherBubble.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleTeacher(); } });
+
+      const voiceCoach = document.getElementById('voiceCoach');
+      document.querySelectorAll('.voice').forEach(v=>{
+        v.addEventListener('click', ()=>{
+          voiceCoach.innerHTML = `<b>Thinking Coach:</b> Nice. Now answer: <i>“What is the author trying to get us to believe about the topic?”</i><br><b>Your turn:</b> Write one sentence below.`;
+          voiceCoach.classList.remove('wiggle');
+          void voiceCoach.offsetWidth;
+          voiceCoach.classList.add('wiggle');
+        });
+      });
+
+      const drags = document.querySelectorAll('.drag');
+      const dropZone = document.getElementById('dropZone');
+      const dragFeedback = document.getElementById('dragFeedback');
+      const dragsHome = document.getElementById('drags');
+
+      let draggedEl = null;
+
+      drags.forEach(el=>{
+        el.addEventListener('dragstart', (e)=>{
+          draggedEl = el;
+          e.dataTransfer.setData('text/plain','ok');
+        });
+      });
+
+      dropZone.addEventListener('dragover', (e)=> e.preventDefault());
+
+      dropZone.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        if(!draggedEl) return;
+
+        dropZone.innerHTML = '';
+        dropZone.appendChild(draggedEl);
+
+        const correct = draggedEl.dataset.correct === 'true';
+        dropZone.classList.remove('good','bad','wiggle');
+
+        if(correct){
+          dragFeedback.innerHTML = `<span class="ok">✅ Correct — that matches the whole passage.</span>`;
+          dropZone.classList.add('good');
+        }else{
+          dragFeedback.innerHTML = `<span class="no">❌ Not quite — that’s a detail or off-topic. Try again.</span>`;
+          dropZone.classList.add('bad','wiggle');
+        }
+      });
+
+      document.getElementById('resetDrag').addEventListener('click', ()=>{
+        const inZone = dropZone.querySelector('.drag');
+        if(inZone) dragsHome.appendChild(inZone);
+
+        dropZone.classList.remove('good','bad','wiggle');
+        dropZone.innerHTML = `<div class="dropPrompt">Drop the controlling idea here</div>`;
+        dragFeedback.textContent = '';
+      });
+
+      const q1Feedback = document.getElementById('q1Feedback');
+      document.getElementById('checkQ1').addEventListener('click', ()=>{
+        const chosen = document.querySelector('input[name="q1"]:checked');
+        q1Feedback.classList.remove('wiggle');
+
+        if(!chosen){
+          q1Feedback.innerHTML = `<span class="no">Pick an answer first.</span>`;
+          void q1Feedback.offsetWidth; q1Feedback.classList.add('wiggle');
+          return;
+        }
+
+        if(chosen.value === 'C'){
+          q1Feedback.innerHTML = `<span class="ok">✅ Correct. The author’s main point is that schools need to prepare/adapt for extreme heat.</span>`;
+        }else{
+          q1Feedback.innerHTML = `<span class="no">❌ Try again. Ask: “Which choice covers the whole passage?”</span>`;
+          void q1Feedback.offsetWidth; q1Feedback.classList.add('wiggle');
+        }
+      });
+
+      document.getElementById('resetQ1').addEventListener('click', ()=>{
+        document.querySelectorAll('input[name="q1"]').forEach(r=> r.checked=false);
+        q1Feedback.textContent = '';
+      });
+
+      const studentResponse = document.getElementById('studentResponse');
+      const saveFeedback = document.getElementById('saveFeedback');
+
+      document.getElementById('saveResponse').addEventListener('click', ()=>{
+        const text = (studentResponse.value || '').trim();
+        saveFeedback.classList.remove('wiggle');
+
+        if(text.length < 10){
+          saveFeedback.innerHTML = `<span class="no">Add more detail. Try starting with: “The author wants readers to understand that…”</span>`;
+          void saveFeedback.offsetWidth; saveFeedback.classList.add('wiggle');
+          return;
+        }
+        try{ sessionStorage.setItem('wc_controlling_idea_response', text); }catch(e){}
+        saveFeedback.innerHTML = `<span class="ok">✅ Saved (on this device/session).</span>`;
+      });
+
+      document.getElementById('clearResponse').addEventListener('click', ()=>{
+        studentResponse.value = '';
+        saveFeedback.textContent = '';
+        try{ sessionStorage.removeItem('wc_controlling_idea_response'); }catch(e){}
+      });
+
+      try{
+        const saved = sessionStorage.getItem('wc_controlling_idea_response');
+        if(saved) studentResponse.value = saved;
+      }catch(e){}
+    });
+  </script>
+</body>
+</html>
