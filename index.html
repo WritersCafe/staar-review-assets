@@ -6,10 +6,16 @@
   <title>Writer’s Cafe — Controlling Idea</title>
   <style>
     :root{
-      --ink:#3b2a1f;
+      --ink:#2b1d16;
+      --ink2:#5a3b2e;
       --paper:#f6ead6;
       --paper2:#f2dfc3;
-      --shadow: rgba(0,0,0,.15);
+      --cream:rgba(255,255,255,.90);
+      --shadow: rgba(0,0,0,.18);
+      --blue:#2f6fed;
+      --pink:#ff4fa3;
+      --mint:#2dd4bf;
+      --gold:#f6c04a;
     }
 
     body{
@@ -28,9 +34,9 @@
       border-radius:18px;
       background: linear-gradient(180deg, var(--paper) 0%, var(--paper2) 100%);
       box-shadow: 0 14px 40px var(--shadow);
-      border:1px solid rgba(0,0,0,.08);
+      border:2px solid rgba(43,29,22,.14);
       overflow:hidden;
-      padding:18px 18px 20px;
+      padding:18px 18px 22px;
     }
 
     /* Optional reference image (OFF by default) */
@@ -39,35 +45,46 @@
       inset:0;
       background:url("https://raw.githubusercontent.com/WritersCafe/staar-review-assets/main/ChatGPT%20Image%20Feb%2024%2C%202026%2C%2006_25_31%20PM.png") center/cover no-repeat;
       opacity:0;
-      pointer-events:none; /* never blocks clicks */
+      pointer-events:none;
       transition: opacity .15s ease;
+      filter: saturate(1.05) contrast(1.05);
     }
-    .ref.on{ opacity:.22; } /* faint tracing layer */
+    .ref.on{ opacity:.18; }
 
-    /* Top header */
+    /* Comic texture overlay (subtle) */
+    .texture{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.22;
+      mix-blend-mode:multiply;
+    }
+
+    /* Masthead */
     .masthead{
       text-align:center;
-      padding:10px 12px 12px;
+      padding:12px 12px 12px;
       border-radius:16px;
-      background: rgba(255,255,255,.55);
-      border:1px solid rgba(0,0,0,.08);
-      backdrop-filter: blur(1px);
+      background: rgba(255,255,255,.60);
+      border:2px solid rgba(43,29,22,.14);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
     }
     .masthead .title{
-      font-weight:900;
-      letter-spacing:.8px;
+      font-weight:950;
+      letter-spacing:1px;
       font-size:24px;
       text-transform:uppercase;
       font-family: Georgia, "Times New Roman", serif;
+      text-shadow: 1px 1px 0 rgba(255,255,255,.55);
     }
     .masthead .subtitle{
-      font-weight:800;
+      font-weight:900;
       font-size:18px;
       margin-top:2px;
       font-family: Georgia, "Times New Roman", serif;
     }
     .masthead .handle{
-      font-weight:700;
+      font-weight:800;
       opacity:.85;
       margin-top:3px;
     }
@@ -84,30 +101,25 @@
       border:none;
       border-radius:999px;
       padding:9px 12px;
-      font-weight:900;
+      font-weight:950;
       cursor:pointer;
       background: rgba(0,0,0,.08);
       color:var(--ink);
+      border:2px solid rgba(43,29,22,.14);
+      box-shadow: 0 8px 16px rgba(0,0,0,.10);
     }
-    .btn.primary{ background: rgba(37,99,235,.16); }
-
-    /* Comic elements */
-    .panel{
-      position:relative;
-      border-radius:16px;
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(0,0,0,.10);
-      box-shadow: 0 12px 26px var(--shadow);
-      padding:12px 14px;
+    .btn.primary{
+      background: rgba(47,111,237,.14);
     }
+    .btn:active{ transform:scale(.99); }
 
+    /* Layout */
     .grid{
       display:grid;
       grid-template-columns: 1.15fr .85fr;
       gap:12px;
       margin-top:10px;
     }
-
     .row2{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -115,32 +127,83 @@
       margin-top:12px;
     }
 
-    /* Speech bubble look */
+    /* Comic panels */
+    .panel{
+      position:relative;
+      border-radius:16px;
+      background: rgba(255,255,255,.75);
+      border:2px solid rgba(43,29,22,.14);
+      box-shadow: 0 12px 26px var(--shadow);
+      padding:12px 14px;
+      overflow:hidden;
+    }
+
+    /* Sticker label */
+    .sticker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.92);
+      border:2px solid rgba(43,29,22,.18);
+      box-shadow: 0 10px 16px rgba(0,0,0,.10);
+      font-weight:950;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+    .sticker.blue{ background: rgba(47,111,237,.12); }
+    .sticker.pink{ background: rgba(255,79,163,.12); }
+    .sticker.gold{ background: rgba(246,192,74,.16); }
+    .sticker.mint{ background: rgba(45,212,191,.12); }
+
+    .sectionTitle{
+      font-weight:950;
+      margin:8px 0 6px;
+    }
+
+    /* Speech bubble */
     .bubble{
       border-radius:22px;
-      background: rgba(255,255,255,.88);
-      border:2px solid rgba(0,0,0,.18);
+      background: var(--cream);
+      border:3px solid rgba(43,29,22,.20);
       padding:12px 14px;
       box-shadow: 0 10px 18px var(--shadow);
       position:relative;
+      overflow:hidden;
+    }
+    /* “ink” shadow offset for comic feel */
+    .bubble::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      transform: translate(2px,2px);
+      border-radius:22px;
+      border:3px solid rgba(43,29,22,.06);
+      pointer-events:none;
     }
     .bubble:after{
       content:"";
       position:absolute;
       width:0;height:0;
       border:12px solid transparent;
-      border-top-color: rgba(255,255,255,.88);
+      border-top-color: var(--cream);
       bottom:-20px;
       left:26px;
-      filter: drop-shadow(0 2px 0 rgba(0,0,0,.18));
+      filter: drop-shadow(0 2px 0 rgba(43,29,22,.18));
       transform: rotate(10deg);
     }
     .bubble .tag{
       font-size:12px;
-      font-weight:900;
-      opacity:.75;
+      font-weight:950;
+      opacity:.78;
       margin-bottom:6px;
       letter-spacing:.2px;
+      text-transform:uppercase;
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
     .bubble.clickable{ cursor:pointer; user-select:none; }
     .bubble.clickable:active{ transform:scale(.99); }
@@ -148,11 +211,12 @@
     /* Thought bubble */
     .thought{
       border-radius:24px;
-      border:2px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.88);
+      border:3px solid rgba(43,29,22,.20);
+      background: var(--cream);
       padding:12px 14px;
       box-shadow: 0 10px 18px var(--shadow);
       position:relative;
+      overflow:hidden;
     }
     .thought:after{
       content:"";
@@ -161,29 +225,36 @@
       bottom:-18px;
       width:14px;height:14px;
       border-radius:50%;
-      background: rgba(255,255,255,.88);
-      border:2px solid rgba(0,0,0,.18);
+      background: var(--cream);
+      border:3px solid rgba(43,29,22,.20);
     }
     .thought:before{
       content:"";
       position:absolute;
       right:40px;
-      bottom:-32px;
+      bottom:-34px;
       width:10px;height:10px;
       border-radius:50%;
-      background: rgba(255,255,255,.88);
-      border:2px solid rgba(0,0,0,.18);
+      background: var(--cream);
+      border:3px solid rgba(43,29,22,.20);
     }
 
-    .sectionTitle{
-      font-weight:950;
-      margin-bottom:6px;
+    /* Character “avatar” circles */
+    .avatar{
+      width:38px; height:38px;
+      border-radius:50%;
+      border:3px solid rgba(43,29,22,.20);
+      background: rgba(255,255,255,.90);
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 16px rgba(0,0,0,.10);
+      flex: 0 0 auto;
     }
 
     /* Passage */
-    .passageText{ line-height:1.45; font-size:14px; }
+    .passageText{ line-height:1.5; font-size:14px; }
 
-    /* Draggables */
+    /* Drags */
     .drags{
       display:flex;
       flex-wrap:wrap;
@@ -192,14 +263,28 @@
     }
     .drag{
       flex: 1 1 210px;
-      background: rgba(255,255,255,.92);
-      border:2px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.94);
+      border:3px solid rgba(43,29,22,.16);
       border-radius:14px;
       padding:10px 10px;
       cursor:grab;
       user-select:none;
-      font-weight:700;
-      box-shadow: 0 10px 16px var(--shadow);
+      font-weight:800;
+      box-shadow: 0 10px 16px rgba(0,0,0,.10);
+      position:relative;
+      overflow:hidden;
+    }
+    /* “comic tape” corner */
+    .drag::after{
+      content:"";
+      position:absolute;
+      top:-10px; right:12px;
+      width:56px; height:20px;
+      background: rgba(246,192,74,.35);
+      border:2px solid rgba(43,29,22,.12);
+      transform: rotate(8deg);
+      border-radius:6px;
+      opacity:.85;
     }
 
     .dropZone{
@@ -208,36 +293,50 @@
       align-items:center;
       justify-content:center;
       border-radius:16px;
-      border:2px dashed rgba(0,0,0,.25);
-      background: rgba(255,255,255,.60);
+      border:3px dashed rgba(43,29,22,.25);
+      background: rgba(255,255,255,.65);
       padding:12px;
       text-align:center;
-      font-weight:900;
+      font-weight:950;
       margin-top:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    /* halftone in drop zone */
+    .dropZone .dots{
+      position:absolute;
+      inset:-40px -40px auto auto;
+      width:180px; height:180px;
+      opacity:.18;
+      pointer-events:none;
+      transform: rotate(12deg);
     }
     .dropZone.good{ border-color: rgba(22,163,74,.65); }
     .dropZone.bad{ border-color: rgba(239,68,68,.65); }
 
-    /* Quick Sip Check */
+    /* Quick Sip Check choices */
     .choice{
       display:flex;
       gap:10px;
       align-items:flex-start;
       padding:10px;
       border-radius:14px;
-      border:1px solid rgba(0,0,0,.10);
-      background: rgba(255,255,255,.72);
+      border:2px solid rgba(43,29,22,.12);
+      background: rgba(255,255,255,.74);
       cursor:pointer;
       user-select:none;
       margin-top:8px;
-      font-weight:650;
+      font-weight:750;
+      position:relative;
+      overflow:hidden;
     }
+    .choice:hover{ transform: translateY(-1px); }
     .choice input{ margin-top:3px; }
 
     textarea{
       width:100%;
       border-radius:14px;
-      border:1px solid rgba(0,0,0,.18);
+      border:2px solid rgba(43,29,22,.18);
       padding:10px;
       font-size:14px;
       background: rgba(255,255,255,.92);
@@ -252,7 +351,7 @@
     .ok{ color:#166534; }
     .no{ color:#b91c1c; }
 
-    /* Tiny wiggle for wrong */
+    /* Wiggle */
     @keyframes wiggle {
       0%{transform:translateX(0)}
       20%{transform:translateX(-4px)}
@@ -262,12 +361,33 @@
       100%{transform:translateX(0)}
     }
     .wiggle{ animation:wiggle .25s linear 2; }
+
+    /* Comic burst behind Quick Sip header */
+    .burstWrap{ position:relative; display:flex; align-items:center; gap:10px; }
+    .burst{
+      width:44px; height:44px; flex:0 0 auto;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.15));
+    }
+
+    /* Stacks */
+    .stackPanel{ display:flex; flex-direction:column; gap:10px; }
   </style>
 </head>
 
 <body>
   <div class="page" id="page">
+    <!-- Optional tracing/reference image (toggle on/off) -->
     <div class="ref" id="ref"></div>
+
+    <!-- Subtle halftone/print texture -->
+    <svg class="texture" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+          <circle cx="2.5" cy="2.5" r="1.3" fill="#000" opacity=".35"></circle>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="1200" height="800" fill="url(#dots)"></rect>
+    </svg>
 
     <div class="masthead">
       <div class="title">WRITER’S CAFE MAGAZINE</div>
@@ -283,7 +403,18 @@
     <!-- Top: teacher bubble + student bubbles -->
     <div class="grid">
       <div class="bubble clickable" id="teacherBubble" role="button" tabindex="0">
-        <div class="tag">Teacher Tip (click)</div>
+        <div class="tag">
+          <span class="avatar" aria-hidden="true">
+            <!-- Simple teacher avatar SVG -->
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="4" fill="rgba(47,111,237,.20)" stroke="rgba(43,29,22,.55)" stroke-width="1.6"/>
+              <path d="M4 22c1.2-5 14.8-5 16 0" fill="rgba(45,212,191,.18)" stroke="rgba(43,29,22,.55)" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M9 7c.8-1.7 5.2-1.7 6 0" fill="none" stroke="rgba(43,29,22,.55)" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </span>
+          Teacher Tip (click)
+          <span class="sticker mint" style="margin-left:auto;">Tap</span>
+        </div>
         <div>
           Think of the controlling idea as the central point of the article—it tells what the whole text is about.
         </div>
@@ -293,24 +424,63 @@
         </div>
       </div>
 
-      <div class="panel">
-        <div class="bubble clickable voice" data-voice="mia" role="button" tabindex="0" style="margin-bottom:10px;">
-          <div class="tag">Mia says (click)</div>
+      <div class="panel stackPanel">
+        <div class="bubble clickable voice" data-voice="mia" role="button" tabindex="0">
+          <div class="tag">
+            <span class="avatar" aria-hidden="true">
+              <!-- Student girl avatar SVG -->
+              <svg width="22" height="22" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" fill="rgba(255,79,163,.18)" stroke="rgba(43,29,22,.55)" stroke-width="1.6"/>
+                <path d="M5 22c1.3-5 12.7-5 14 0" fill="rgba(255,255,255,.2)" stroke="rgba(43,29,22,.55)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M7 9c2-3 8-3 10 0" fill="none" stroke="rgba(43,29,22,.55)" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+            </span>
+            Mia says (click)
+          </div>
           <div>“It’s the main idea… like the headline of an article, right?”</div>
         </div>
+
         <div class="bubble clickable voice" data-voice="jay" role="button" tabindex="0">
-          <div class="tag">Jay says (click)</div>
+          <div class="tag">
+            <span class="avatar" aria-hidden="true">
+              <!-- Student boy avatar SVG -->
+              <svg width="22" height="22" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" fill="rgba(246,192,74,.22)" stroke="rgba(43,29,22,.55)" stroke-width="1.6"/>
+                <path d="M5 22c1.3-5 12.7-5 14 0" fill="rgba(255,255,255,.2)" stroke="rgba(43,29,22,.55)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M8 6c1-1.5 7-1.5 8 0" fill="none" stroke="rgba(43,29,22,.55)" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+            </span>
+            Jay says (click)
+          </div>
           <div>“Yeah, it’s the author’s key message.”</div>
         </div>
 
-        <div class="panel" id="coachNote" style="margin-top:10px; background:rgba(255,255,255,.68);">
-          <b>Thinking Coach:</b> Click a bubble → then answer: <i>“What is the author trying to get us to believe?”</i>
+        <div class="panel" id="coachNote" style="background:rgba(255,255,255,.68);">
+          <span class="sticker gold">
+            <!-- tiny sparkle -->
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2l1.2 6.2L20 12l-6.8 3.8L12 22l-1.2-6.2L4 12l6.8-3.8L12 2z"
+                fill="rgba(246,192,74,.55)" stroke="rgba(43,29,22,.5)" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+            Thinking Coach
+          </span>
+          <div style="margin-top:8px;">
+            Click a bubble → then answer: <i>“What is the author trying to get us to believe?”</i>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Passage -->
     <div class="panel" style="margin-top:12px;">
+      <span class="sticker blue">
+        <!-- tiny book icon -->
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 4h11a2 2 0 0 1 2 2v14H8a2 2 0 0 0-2 2V4z" fill="rgba(47,111,237,.18)" stroke="rgba(43,29,22,.5)" stroke-width="1.4"/>
+          <path d="M6 4v16a2 2 0 0 1 2-2h11" fill="none" stroke="rgba(43,29,22,.5)" stroke-width="1.4"/>
+        </svg>
+        Read
+      </span>
       <div class="sectionTitle">Read the mini article</div>
       <div class="passageText">
         Texas summers can be brutally hot, with temperatures often exceeding 100°F. Extreme heat poses risks to
@@ -321,6 +491,7 @@
     <!-- Definition + Drag/Drop -->
     <div class="row2">
       <div class="panel">
+        <span class="sticker mint">Definition</span>
         <div class="sectionTitle">Controlling Idea =</div>
         <div style="line-height:1.4;">
           The controlling idea is the <b>main point</b> the author wants to make.
@@ -336,8 +507,19 @@
       </div>
 
       <div class="panel">
+        <span class="sticker pink">Drag & Drop</span>
         <div class="sectionTitle">Drag the BEST controlling idea into the box</div>
+
         <div class="dropZone" id="dropZone">
+          <!-- halftone corner -->
+          <svg class="dots" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <pattern id="halftone" width="12" height="12" patternUnits="userSpaceOnUse">
+                <circle cx="2.5" cy="2.5" r="1.6" fill="#000" opacity=".55"></circle>
+              </pattern>
+            </defs>
+            <rect width="200" height="200" fill="url(#halftone)"></rect>
+          </svg>
           Drop the controlling idea here
         </div>
 
@@ -355,8 +537,27 @@
     <!-- Quick Sip Check + Response -->
     <div class="row2">
       <div class="panel">
-        <div class="sectionTitle">Quick Sip Check ☕</div>
-        <div style="font-weight:800;">What’s the controlling idea of the article?</div>
+        <div class="burstWrap">
+          <!-- comic burst -->
+          <svg class="burst" viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M32 2l6 10 10-6 2 12 12-2-6 10 10 6-10 6 6 10-12-2-2 12-10-6-6 10-6-10-10 6-2-12-12 2 6-10-10-6 10-6-6-10 12 2 2-12 10 6 6-10z"
+              fill="rgba(246,192,74,.45)" stroke="rgba(43,29,22,.55)" stroke-width="2" />
+            <circle cx="32" cy="32" r="10" fill="rgba(255,255,255,.6)" stroke="rgba(43,29,22,.35)" stroke-width="2"/>
+          </svg>
+          <div>
+            <span class="sticker gold">
+              <!-- coffee icon -->
+              <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 8h10v6a5 5 0 0 1-5 5H6V8z" fill="rgba(246,192,74,.30)" stroke="rgba(43,29,22,.5)" stroke-width="1.4"/>
+                <path d="M16 9h2a2 2 0 0 1 0 4h-2" fill="none" stroke="rgba(43,29,22,.5)" stroke-width="1.4"/>
+                <path d="M8 4c0 2 2 2 2 4M12 4c0 2 2 2 2 4" fill="none" stroke="rgba(43,29,22,.5)" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              Quick Sip Check
+            </span>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; font-weight:900;">What’s the controlling idea of the article?</div>
 
         <label class="choice"><input type="radio" name="q1" value="A"> A. Hot weather makes summer fun.</label>
         <label class="choice"><input type="radio" name="q1" value="B"> B. Students should drink plenty of water.</label>
@@ -372,6 +573,7 @@
       </div>
 
       <div class="panel">
+        <span class="sticker blue">Write</span>
         <div class="sectionTitle">Write your “own words” controlling idea</div>
         <textarea id="studentResponse" rows="4" placeholder="Start with: The author wants readers to understand that..."></textarea>
 
@@ -388,7 +590,7 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Reference image toggle (for alignment only)
+      // Reference image toggle (alignment only)
       const ref = document.getElementById("ref");
       document.getElementById("toggleRef").addEventListener("click", () => {
         ref.classList.toggle("on");
@@ -409,8 +611,12 @@
       const coachNote = document.getElementById("coachNote");
       document.querySelectorAll(".voice").forEach(v => {
         v.addEventListener("click", () => {
-          coachNote.innerHTML = `<b>Thinking Coach:</b> Now say it as ONE sentence: <i>“This article is mainly about how…”</i>`;
-          coachNote.classList.remove("wiggle"); void coachNote.offsetWidth; coachNote.classList.add("wiggle");
+          coachNote.innerHTML =
+            `<span class="sticker gold" style="margin-bottom:8px; display:inline-flex;">Thinking Coach</span>
+             <div><b>Your turn:</b> Say it as ONE sentence: <i>“This article is mainly about how…”</i></div>`;
+          coachNote.classList.remove("wiggle");
+          void coachNote.offsetWidth;
+          coachNote.classList.add("wiggle");
         });
       });
 
@@ -432,7 +638,7 @@
         e.preventDefault();
         if(!draggedEl) return;
 
-        dropZone.innerHTML = "";
+        dropZone.innerHTML = '';
         dropZone.appendChild(draggedEl);
 
         const correct = draggedEl.dataset.correct === "true";
@@ -500,9 +706,10 @@
 
       // Reset all
       document.getElementById("resetAll").addEventListener("click", ()=> {
-        // Put dragged item back
+        // Return drag item if in zone
         const inZone = dropZone.querySelector(".drag");
         if(inZone) dragsHome.appendChild(inZone);
+
         dropZone.classList.remove("good","bad","wiggle");
         dropZone.textContent = "Drop the controlling idea here";
         dragFeedback.textContent = "";
